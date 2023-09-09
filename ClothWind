@@ -1,0 +1,56 @@
+using UnityEngine;
+using MagicaCloth2;
+
+public class ClothWind : MonoBehaviour
+{
+    public MagicaWindZone windZone;
+    public float idleWindStrength = 5.0f;
+    public float walkWindStrength = 10.0f;
+    public float runWindStrength = 15.0f;
+    public float maxWalkSpeed = 9.0f; // Maximum speed for walk state
+
+    private CharacterController characterController;
+
+    private void Start()
+    {
+        characterController = GetComponent<CharacterController>();
+        if (windZone == null)
+        {
+            Debug.LogError("MagicaWindZone component not assigned to ClothWind.");
+        }
+    }
+
+    private void Update()
+    {
+        float characterSpeed = characterController.velocity.magnitude;
+
+        if (characterSpeed <= 0.1f)
+        {
+            windZone.main = idleWindStrength;
+        }
+        else if (characterSpeed > 0.1f && characterSpeed <= maxWalkSpeed)
+        {
+            windZone.main = walkWindStrength;
+        }
+        else
+        {
+            windZone.main = runWindStrength;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("WindZone"))
+        {
+            idleWindStrength = 0;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("WindZone"))
+        {
+            idleWindStrength = 5.0f; // Reset to initial value
+        }
+    }
+}
